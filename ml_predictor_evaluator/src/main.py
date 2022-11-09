@@ -112,7 +112,7 @@ def evaluate_prediction(predicted_parameters, true_parameters, reference_teff=No
         plt.subplots_adjust(hspace=0.0, top=0.95, right=0.97)
 
         if savepath:
-            plt.savefig('OBS_detached_plots/' + target_name)
+            plt.savefig(f'{savepath}/' + target_name)
         else:
             plt.show()
 
@@ -123,8 +123,8 @@ def evaluate_prediction(predicted_parameters, true_parameters, reference_teff=No
 
 if __name__ == "__main__":
     # data folder
-    target_csv = 'target_det_obs.csv'
-    savepath = 'src/OBS_detached_plots'
+    target_csv = 'target_over_obs.csv'
+    savepath = 'OBS_overcontact_plots'
 
     df = pd.read_csv(target_csv)
     df['name'] = df['Unnamed: 0'].astype(str) + "-" + df["name"]
