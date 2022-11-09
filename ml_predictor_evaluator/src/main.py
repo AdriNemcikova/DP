@@ -1,4 +1,3 @@
-import os
 import numpy as np
 import pandas as pd
 import traceback
@@ -10,7 +9,6 @@ from elisa.analytics.binary_fit.shared import r_squared
 from src.config import SYSTEM_DICT, DEFAULT_PASSBAND
 from matplotlib import gridspec
 import matplotlib.pyplot as plt
-from sklearn.metrics import mean_squared_error
 
 
 def evaluate_parameter_set(parameters, reference_teff, passband, phases):
@@ -86,14 +84,11 @@ def evaluate_prediction(predicted_parameters, true_parameters, reference_teff=No
     print('true params - eval function done')
 
     r2 = r_squared(synthetic, observed)
-    mse = mean_squared_error(observed, synthetic)
     print(f'R2 = {r2}')
-    # print(f'MSE = {mse}')
 
     if display_comparison:
         fig = plt.figure(figsize=(8, 6))
-        # r2text = r'$R^2 = $' + str(round(r2, 2)) # zamenit za sigmu
-        mse_text = r'$MSE = $' + str(round(mse, 2))
+        r2text = r'$R^2 = $' + str(round(r2, 2))
         gs = gridspec.GridSpec(2, 1, height_ratios=[3, 1])
         ax1 = fig.add_subplot(gs[0])
         ax2 = fig.add_subplot(gs[1], sharex=ax1)
@@ -109,12 +104,10 @@ def evaluate_prediction(predicted_parameters, true_parameters, reference_teff=No
         ax2.set_ylabel('Residuals')
 
         if target_name is not None:
-            # ax1.set_title(f'{target_name}, {r2text}')
-            ax1.set_title(f'{target_name}, {mse_text}')
+            ax1.set_title(f'{target_name}, {r2text}')
 
         else:
-            # ax1.set_title(r2text)
-            ax1.set_title(mse_text)
+            ax1.set_title(r2text)
 
         plt.subplots_adjust(hspace=0.0, top=0.95, right=0.97)
 
@@ -130,37 +123,52 @@ def evaluate_prediction(predicted_parameters, true_parameters, reference_teff=No
 
 if __name__ == "__main__":
     # data folder
-    # target_csv = 'observed_detached.csv'
     target_csv = 'target_det_obs.csv'
-    # savepath = 'src/plots'
     savepath = 'src/OBS_detached_plots'
 
     df = pd.read_csv(target_csv)
-    names = df['name'].unique()
+    df['name'] = df['Unnamed: 0'].astype(str) + "-" + df["name"]
+    # names = df['name'].unique() # potrebne v pripade spriemernovania
 
+    names = df['name']
     for name in names:
         print(f"Selected target: {name}")
         row = df[df['name'] == name]
 
         predicted = dict(
-            # mass_ratio=float(row['q_predicted'].mean()),
-            mass_ratio=float(row['pred_q'].mean()),
-            inclination=float(row['pred_inc'].mean()),
-            t1_to_t2=float(row['pred_t1_t2'].mean()),
-            omega1=float(row['pred_omega1'].mean()),
-            omega2=float(row['pred_omega2'].mean()),
-            # r1=float(row['prim_eq_radius_predicted'].mean()),
-            # r2=float(row['sec_eq_radius_predicted'].mean())
+            mass_ratio=float(row['pred_q']),
+            inclination=float(row['pred_inc']),
+            t1_to_t2=float(row['pred_t1_t2']),
+            omega1=float(row['pred_omega1']),
+            omega2=float(row['pred_omega2']),
         )
         observed = dict(
-            mass_ratio=float(row['q'].mean()),
-            inclination=float(row['inc'].mean()),
-            t1_to_t2=float(row['t1_t2'].mean()),
-            omega1=float(row['omega1'].mean()),
-            omega2=float(row['omega2'].mean()),
-            # r1=float(row['primary__equivalent_radius'].mean()),
-            # r2=float(row['secondary__equivalent_radius'].mean())
+            mass_ratio=float(row['q']),
+            inclination=float(row['inc']),
+            t1_to_t2=float(row['t1_t2']),
+            omega1=float(row['omega1']),
+            omega2=float(row['omega2']),
         )
+
+        # predicted = dict(
+        #     # mass_ratio=float(row['q_predicted'].mean()),
+        #     mass_ratio=float(row['pred_q'].mean()),
+        #     inclination=float(row['pred_inc'].mean()),
+        #     t1_to_t2=float(row['pred_t1_t2'].mean()),
+        #     omega1=float(row['pred_omega1'].mean()),
+        #     omega2=float(row['pred_omega2'].mean()),
+        #     # r1=float(row['prim_eq_radius_predicted'].mean()),
+        #     # r2=float(row['sec_eq_radius_predicted'].mean())
+        # )
+        # observed = dict(
+        #     mass_ratio=float(row['q'].mean()),
+        #     inclination=float(row['inc'].mean()),
+        #     t1_to_t2=float(row['t1_t2'].mean()),
+        #     omega1=float(row['omega1'].mean()),
+        #     omega2=float(row['omega2'].mean()),
+        #     # r1=float(row['primary__equivalent_radius'].mean()),
+        #     # r2=float(row['secondary__equivalent_radius'].mean())
+        # )
 
         # evaluate_prediction(predicted, observed, display_comparison=True, target_name=row['name'])
 
