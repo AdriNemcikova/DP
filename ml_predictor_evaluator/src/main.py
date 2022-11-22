@@ -9,6 +9,7 @@ from elisa.analytics.binary_fit.shared import r_squared
 from src.config import SYSTEM_DICT, DEFAULT_PASSBAND
 from matplotlib import gridspec
 import matplotlib.pyplot as plt
+import os
 
 
 def evaluate_parameter_set(parameters, reference_teff, passband, phases):
@@ -91,6 +92,7 @@ def evaluate_prediction(predicted_parameters, true_parameters, reference_teff=No
         r2text = r'$R^2 = $' + str(round(r2, 2))
         gs = gridspec.GridSpec(2, 1, height_ratios=[3, 1])
         ax1 = fig.add_subplot(gs[0])
+        ax1.set_ylim([0.55, 1]) # nastavenie konstantnej osi y
         ax2 = fig.add_subplot(gs[1], sharex=ax1)
 
         ax1.plot(phases, synthetic[passband], label='predicted')
@@ -123,11 +125,11 @@ def evaluate_prediction(predicted_parameters, true_parameters, reference_teff=No
 
 if __name__ == "__main__":
     # data folder
-    target_csv = 'target_over_obs.csv'
-    savepath = 'OBS_overcontact_plots'
+    target_csv = os.path.dirname(os.path.abspath(__file__)) + '\\data\\det_data_Bessel_U.csv'
+    savepath = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\det_bessell_u'
 
     df = pd.read_csv(target_csv)
-    df['name'] = df['Unnamed: 0'].astype(str) + "-" + df["name"]
+    df['name'] = df['id'].astype(str) + "-" + df["filter"]
     # names = df['name'].unique() # potrebne v pripade spriemernovania
 
     names = df['name']
@@ -143,11 +145,11 @@ if __name__ == "__main__":
             omega2=float(row['pred_omega2']),
         )
         observed = dict(
-            mass_ratio=float(row['q']),
-            inclination=float(row['inc']),
+            mass_ratio=float(row['mass_ratio']),
+            inclination=float(row['inclination']),
             t1_to_t2=float(row['t1_t2']),
-            omega1=float(row['omega1']),
-            omega2=float(row['omega2']),
+            omega1=float(row['primary__surface_potential']),
+            omega2=float(row['secondary__surface_potential']),
         )
 
         # predicted = dict(
