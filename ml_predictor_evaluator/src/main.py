@@ -1,3 +1,10 @@
+"""
+    Skript, ktory sluzi na vykreslenie skutocnej krivky a jej prisluchajucej predikcii.
+    Data sa ziskavaju zo suborov, ktorych cesta sa definuje v main funkcii
+    Ploty sa ukladaju do definovanych priecinkov
+"""
+
+
 import numpy as np
 import pandas as pd
 import traceback
@@ -20,11 +27,13 @@ def evaluate_parameter_set(parameters, reference_teff, passband, phases):
     omega2 = parameters['omega2']
     # omega1 = parameters.get('omega1', None) # potentials
     # omega2 = parameters.get('omega2', None)
+    # r1 = parameters['r1']
+    # r2 = parameters['r2']
     r1 = parameters.get('r1', None)
     r2 = parameters.get('r2', None)
 
     # making sure that either potentials or radii are used, not both at the same time
-    if not xor(r1 is None, omega1 is None) or not xor(r2 is None, omega2 is None):  
+    if not xor(r1 is None, omega1 is None) or not xor(r2 is None, omega2 is None):
         raise ValueError('Supply either radii (`r1`, `r2`) or surface potentials (`omega1`, `omega2`).')
 
     system_dict = copy(SYSTEM_DICT)
@@ -83,16 +92,16 @@ def evaluate_prediction(predicted_parameters, true_parameters, reference_teff=No
     print("predicted params - eval function done")
     observed = evaluate_parameter_set(true_parameters, reference_teff, passband, phases)
     print('true params - eval function done')
-
+    residual = np.sum([np.sum(np.power(synthetic[item] - observed[item], 2)) for item in observed])
     r2 = r_squared(synthetic, observed)
     print(f'R2 = {r2}')
+    print(f'Residuals: {residual}')
 
     if display_comparison:
         fig = plt.figure(figsize=(8, 6))
-        r2text = r'$R^2 = $' + str(round(r2, 2))
+        r2text = r'$R^2 = $' + str(round(r2, 2)) + r' Resid = ' + str(round(residual, 2))
         gs = gridspec.GridSpec(2, 1, height_ratios=[3, 1])
         ax1 = fig.add_subplot(gs[0])
-        ax1.set_ylim([0.55, 1]) # nastavenie konstantnej osi y
         ax2 = fig.add_subplot(gs[1], sharex=ax1)
 
         ax1.plot(phases, synthetic[passband], label='predicted')
@@ -125,11 +134,15 @@ def evaluate_prediction(predicted_parameters, true_parameters, reference_teff=No
 
 if __name__ == "__main__":
     # data folder
-    target_csv = os.path.dirname(os.path.abspath(__file__)) + '\\data\\det_data_Bessel_U.csv'
-    savepath = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\det_bessell_u'
+    target_csv = os.path.dirname(os.path.abspath(__file__)) + '\\data\\OBS_overcontact_model.csv'
+    savepath = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\observed\\obs_over'
 
     df = pd.read_csv(target_csv)
-    df['name'] = df['id'].astype(str) + "-" + df["filter"]
+    # df['name'] = "Orig pred - " + df['id'].astype(str) + "-" + df["filter"]  # pre synteticke original
+    # df['name'] = "Shift 1 up - " + df['id'].astype(str) + "-" + df["filter"]  # pre synteticke posunute predikcie
+    # df['name'] = "Shift 2 up - " + df['id'].astype(str) + "-" + df["filter"]  # pre synteticke posunute predikcie
+    # df['name'] = "Shift 1 down - " + df['id'].astype(str) + "-" + df["filter"]  # pre synteticke posunute predikcie
+    df['name'] = df['name'] + '-' + df['filter']  # pre observed
     # names = df['name'].unique() # potrebne v pripade spriemernovania
 
     names = df['name']
@@ -143,36 +156,30 @@ if __name__ == "__main__":
             t1_to_t2=float(row['pred_t1_t2']),
             omega1=float(row['pred_omega1']),
             omega2=float(row['pred_omega2']),
+            # r1=float(row['pred_prim_radius']),
+            # r2=float(row['pred_sec_radius']),
         )
-        observed = dict(
-            mass_ratio=float(row['mass_ratio']),
-            inclination=float(row['inclination']),
-            t1_to_t2=float(row['t1_t2']),
-            omega1=float(row['primary__surface_potential']),
-            omega2=float(row['secondary__surface_potential']),
-        )
-
-        # predicted = dict(
-        #     # mass_ratio=float(row['q_predicted'].mean()),
-        #     mass_ratio=float(row['pred_q'].mean()),
-        #     inclination=float(row['pred_inc'].mean()),
-        #     t1_to_t2=float(row['pred_t1_t2'].mean()),
-        #     omega1=float(row['pred_omega1'].mean()),
-        #     omega2=float(row['pred_omega2'].mean()),
-        #     # r1=float(row['prim_eq_radius_predicted'].mean()),
-        #     # r2=float(row['sec_eq_radius_predicted'].mean())
-        # )
+        # # pre synteticke
         # observed = dict(
-        #     mass_ratio=float(row['q'].mean()),
-        #     inclination=float(row['inc'].mean()),
-        #     t1_to_t2=float(row['t1_t2'].mean()),
-        #     omega1=float(row['omega1'].mean()),
-        #     omega2=float(row['omega2'].mean()),
-        #     # r1=float(row['primary__equivalent_radius'].mean()),
-        #     # r2=float(row['secondary__equivalent_radius'].mean())
+        #     mass_ratio=float(row['mass_ratio']),
+        #     inclination=float(row['inclination']),
+        #     t1_to_t2=float(row['t1_t2']),
+        #     omega1=float(row['primary__surface_potential']),
+        #     omega2=float(row['secondary__surface_potential']),
+        #     # r1=float(row['primary__equivalent_radius']),
+        #     # r2=float(row['secondary__equivalent_radius']),
         # )
+        # pre observacne data
+        observed = dict(
+            mass_ratio=float(row['q']),
+            inclination=float(row['inc']),
+            t1_to_t2=float(row['t1_t2']),
+            omega1=float(row['omega1']),
+            omega2=float(row['omega2']),
+            # r1=float(row['primary__equivalent_radius']),
+            # r2=float(row['secondary__equivalent_radius']),
+        )
 
-        # evaluate_prediction(predicted, observed, display_comparison=True, target_name=row['name'])
 
         try:
             evaluate_prediction(predicted, observed, display_comparison=True, target_name=name, savepath=savepath)

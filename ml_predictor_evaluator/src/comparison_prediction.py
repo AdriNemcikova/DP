@@ -1,48 +1,68 @@
+"""
+    Skript, ktory sluzi na porovnanie upravenych predikcii pre analyzu citlivosti
+"""
+
 import os
 import re
 from PIL import Image
 
 
-def get_concat_v(im1, im2):
+def get_concat_h(im1, im2, im3, im4):
     """
-        Function to vertically join images
-    :param im1:
-    :param im2:
-    :return:
+        Funkcia na horizontalne spojenie obrazkov
     """
-    dst = Image.new('RGB', (im1.width, im1.height + im2.height))
+    dst = Image.new('RGB', (im1.width + im2.width + im3.width + im4.width, im1.height))
     dst.paste(im1, (0, 0))
-    dst.paste(im2, (0, im1.height))
+    dst.paste(im2, (im1.width, 0))
+    dst.paste(im3, (im1.width + im2.width, 0))
+    dst.paste(im4, (im1.width + im2.width + im3.width, 0))
     return dst
 
 
-def get_comparison(dir_original, dir_adjusted, dir_compared):
+def get_comparison(dir_original, dir_shifted_one_up, dir_shifted_two_up, dir_shifted_one_down, dir_compared):
     """
-        Function to vertically join images of original and adjusted predictions
-    :param dir_original: directory with original predictions
-    :param dir_adjusted: directory with adjusted predictions
-    :param dir_compared: directory where to save compared predictions
-    :return:
+        Funkcia na ziskanie plotov zo 4 suborov, ktore ak sa zhoduju v ID v nazve, spoja sa do jedneho obrazka
     """
+    global img2, img3, img4
     for original_pred_name in os.listdir(dir_original):
         orig_id = re.sub(r"\D", "", original_pred_name)
-        img1 = Image.open(dir_original_predictions + original_pred_name)
+        img1 = Image.open(dir_original + original_pred_name)
 
-        for adjusted_pred_name in os.listdir(dir_adjusted):
-            adjusted_id = re.sub(r"\D", "", adjusted_pred_name)
-            if adjusted_id == orig_id:
-                img2 = Image.open(dir_adjusted_predictions + adjusted_pred_name)
+        for shifted_one_up_pred_name in os.listdir(dir_shifted_one_up):
+            shifted_one_up_id = re.sub(r"\D", "", shifted_one_up_pred_name)
+            if shifted_one_up_id[1:] == orig_id:
+                img2 = Image.open(dir_shifted_one_up + shifted_one_up_pred_name)
+                break
+            else:
+                img2 = None
 
-                get_concat_v(img1, img2).save(f'{dir_compared}' + f'{original_pred_name}')
+        for shifted_two_up_pred_name in os.listdir(dir_shifted_two_up):
+            shifted_two_up_id = re.sub(r"\D", "", shifted_two_up_pred_name)
+            if shifted_two_up_id[1:] == orig_id:
+                img3 = Image.open(dir_shifted_two_up + shifted_two_up_pred_name)
+                break
+            else:
+                img3 = None
 
+        for shifted_one_down_pred_name in os.listdir(dir_shifted_one_down):
+            shifted_one_down_id = re.sub(r"\D", "", shifted_one_down_pred_name)
+            if shifted_one_down_id[1:] == orig_id:
+                img4 = Image.open(dir_shifted_one_down + shifted_one_down_pred_name)
+                break
+            else:
+                img4 = None
+        if img2 is not None and img3 is not None and img4 is not None:
+            get_concat_h(img1, img2, img3, img4).save(f'{dir_compared}' + f'{original_pred_name}')
 
-dir_original_predictions = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\citlivost_true\\original_pred_tess\\'
-dir_adjusted_predictions = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\citlivost_upravene' \
-                                                                        '\\upravene_pred_tess\\ '
-dir_compared_preds = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\predictions_compared\\compared_tess\\'
+"""Zadefinovanie ciest k suborom"""
+dir_original_preds = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Analyza_citlivosti\\predictions_original\\original_pred_kepler\\'
+dir_shift_one_up_pred = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Analyza_citlivosti\\predictions_one_up\\one_up_pred_kepler\\'
+dir_shift_two_up_pred = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Analyza_citlivosti\\predictions_two_up\\two_up_pred_kepler\\'
+dir_shift_one_down_pred = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Analyza_citlivosti\\predictions_one_down\\one_down_pred_kepler\\'
+dir_compared_preds = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Analyza_citlivosti\\comparison\\compared_kepler\\'
 
-# COMPARISON OF ORIGINAL AND ADJUSTED PREDICTION
-get_comparison(dir_original_predictions, dir_adjusted_predictions, dir_compared_preds)
+"""Pouzitie funkcie na porovnanie plotov predikcii"""
+get_comparison(dir_original_preds, dir_shift_one_up_pred, dir_shift_two_up_pred, dir_shift_one_down_pred, dir_compared_preds)
 
 
 
