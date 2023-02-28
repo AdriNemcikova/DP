@@ -55,11 +55,11 @@ def get_comparison(dir_original, dir_shifted_one_up, dir_shifted_two_up, dir_shi
             get_concat_h(img1, img2, img3, img4).save(f'{dir_compared}' + f'{original_pred_name}')
 
 """Zadefinovanie ciest k suborom"""
-dir_original_preds = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Analyza_citlivosti\\predictions_original\\original_pred_kepler\\'
-dir_shift_one_up_pred = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Analyza_citlivosti\\predictions_one_up\\one_up_pred_kepler\\'
-dir_shift_two_up_pred = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Analyza_citlivosti\\predictions_two_up\\two_up_pred_kepler\\'
-dir_shift_one_down_pred = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Analyza_citlivosti\\predictions_one_down\\one_down_pred_kepler\\'
-dir_compared_preds = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Analyza_citlivosti\\comparison\\compared_kepler\\'
+dir_original_preds = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Sensitivity_analysis\\predictions_original\\original_pred_kepler\\'
+dir_shift_one_up_pred = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Sensitivity_analysis\\predictions_one_up\\one_up_pred_kepler\\'
+dir_shift_two_up_pred = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Sensitivity_analysis\\predictions_two_up\\two_up_pred_kepler\\'
+dir_shift_one_down_pred = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Sensitivity_analysis\\predictions_one_down\\one_down_pred_kepler\\'
+dir_compared_preds = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Sensitivity_analysis\\comparison\\compared_kepler\\'
 
 """Pouzitie funkcie na porovnanie plotov predikcii"""
 get_comparison(dir_original_preds, dir_shift_one_up_pred, dir_shift_two_up_pred, dir_shift_one_down_pred, dir_compared_preds)
