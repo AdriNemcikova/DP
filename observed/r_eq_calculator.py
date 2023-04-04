@@ -1,7 +1,3 @@
-"""
-    Python skript pre vypocet radiusov
-"""
-
 from elisa import BinarySystem
 
 
