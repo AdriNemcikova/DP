@@ -1,9 +1,8 @@
 """
-    Skript, ktory sluzi na vykreslenie skutocnej krivky a jej prisluchajucej predikcii.
-    Data sa ziskavaju zo suborov, ktorych cesta sa definuje v main funkcii
-    Ploty sa ukladaju do definovanych priecinkov
+    A script that is used to plot the actual curve and its corresponding prediction and calculate residuals.
+    Data is obtained from files whose path is defined in the main function.
+    Plots are saved in defined directories.
 """
-
 
 import numpy as np
 import pandas as pd
@@ -25,8 +24,6 @@ def evaluate_parameter_set(parameters, reference_teff, passband, phases):
     t1_to_t2 = parameters['t1_to_t2']
     omega1 = parameters['omega1']
     omega2 = parameters['omega2']
-    # omega1 = parameters.get('omega1', None) # potentials
-    # omega2 = parameters.get('omega2', None)
     # r1 = parameters['r1']
     # r2 = parameters['r2']
     r1 = parameters.get('r1', None)
@@ -66,7 +63,6 @@ def evaluate_parameter_set(parameters, reference_teff, passband, phases):
     return o.fluxes
 
 
-# FUNKCIA NA VYKRESLENIE GRAFOV - POROVNANIE TRUE A PREDICTED
 def evaluate_prediction(predicted_parameters, true_parameters, reference_teff=None, passband=None, phases=None,
                         display_comparison=False, target_name=None, savepath=None):
     """
@@ -86,7 +82,6 @@ def evaluate_prediction(predicted_parameters, true_parameters, reference_teff=No
     """
     passband = DEFAULT_PASSBAND if passband is None else passband
     phases = np.linspace(0.0, 1.0, 400, endpoint=False) if phases is None else None
-    # phases = np.linspace(0.0, 1.0, 400, endpoint=False) if phases is None else phases
 
     synthetic = evaluate_parameter_set(predicted_parameters, reference_teff, passband, phases)
     print("predicted params - eval function done")
@@ -123,59 +118,53 @@ def evaluate_prediction(predicted_parameters, true_parameters, reference_teff=No
         plt.subplots_adjust(hspace=0.0, top=0.95, right=0.97)
 
         if savepath:
-            plt.savefig(f'{savepath}/' + target_name)
+            plt.savefig(f'{savepath}/' + str(target_name) + "diff_t")
         else:
             plt.show()
 
     return r2
-    # o.observe.lc(from_phase=-0.5, to_phase=0.5, phase_step=0.01)
-    # o.plot.lc()
 
 
 if __name__ == "__main__":
-    # data folder
+    # Defined path to folder with true and predicted values
     target_csv = os.path.dirname(os.path.abspath(__file__)) + '\\data\\OBS_overcontact_model.csv'
-    savepath = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\observed\\obs_over'
+
+    # Defined path to folder where we will save plotted light curves
+    savepath = os.path.dirname(os.path.abspath(__file__)) + '\\data'
 
     df = pd.read_csv(target_csv)
-    # df['name'] = "Orig pred - " + df['id'].astype(str) + "-" + df["filter"]  # pre synteticke original
-    # df['name'] = "Shift 1 up - " + df['id'].astype(str) + "-" + df["filter"]  # pre synteticke posunute predikcie
-    # df['name'] = "Shift 2 up - " + df['id'].astype(str) + "-" + df["filter"]  # pre synteticke posunute predikcie
-    # df['name'] = "Shift 1 down - " + df['id'].astype(str) + "-" + df["filter"]  # pre synteticke posunute predikcie
-    df['name'] = df['name'] + '-' + df['filter']  # pre observed
-    # names = df['name'].unique() # potrebne v pripade spriemernovania
+    # df['name'] = "Orig pred - " + df['id'].astype(str) + "-" + df["filter"]  # for synthetic original
+    # df['name'] = "Shift 1 up - " + df['id'].astype(str) + "-" + df["filter"]  # for synthetic shifited predictions
+    # df['name'] = "Shift 2 up - " + df['id'].astype(str) + "-" + df["filter"]  # for synthetic shifited predictions
+    # df['name'] = "Shift 1 down - " + df['id'].astype(str) + "-" + df["filter"]  # for synthetic shifited predictions
+    # df['name'] = df['name'] + '-' + df['filter']  # for observed data
+    # names = df['name'].unique() # use in case of using average values of parameters, e.g. for observed light curve we have more variations
 
-    names = df['name']
+    names = df['id']
     for name in names:
         print(f"Selected target: {name}")
-        row = df[df['name'] == name]
+        row = df[df['id'] == name]
 
+        # Loading of PREDICTED values
+        # need to check if name of columns are corresponding to the names of columns if csv file loaded
         predicted = dict(
-            mass_ratio=float(row['pred_q']),
-            inclination=float(row['pred_inc']),
-            t1_to_t2=float(row['pred_t1_t2']),
-            omega1=float(row['pred_omega1']),
-            omega2=float(row['pred_omega2']),
+            mass_ratio=float(row['p_q']),
+            inclination=float(row['p_inc']),
+            t1_to_t2=float(row['p_t1t2']),
+            omega1=float(row['p_omega1']),
+            omega2=float(row['p_omega2']),
             # r1=float(row['pred_prim_radius']),
             # r2=float(row['pred_sec_radius']),
         )
-        # # pre synteticke
-        # observed = dict(
-        #     mass_ratio=float(row['mass_ratio']),
-        #     inclination=float(row['inclination']),
-        #     t1_to_t2=float(row['t1_t2']),
-        #     omega1=float(row['primary__surface_potential']),
-        #     omega2=float(row['secondary__surface_potential']),
-        #     # r1=float(row['primary__equivalent_radius']),
-        #     # r2=float(row['secondary__equivalent_radius']),
-        # )
-        # pre observacne data
+
+        # Loading of TRUE values
+        # need to check if name of columns are corresponding to the names of columns if csv file loaded
         observed = dict(
-            mass_ratio=float(row['q']),
-            inclination=float(row['inc']),
-            t1_to_t2=float(row['t1_t2']),
-            omega1=float(row['omega1']),
-            omega2=float(row['omega2']),
+            mass_ratio=float(row['mass_ratio']),
+            inclination=float(row['inclination']),
+            t1_to_t2=float(row['t1/t2']),
+            omega1=float(row['primary__surface_potential']),
+            omega2=float(row['secondary__surface_potential']),
             # r1=float(row['primary__equivalent_radius']),
             # r2=float(row['secondary__equivalent_radius']),
         )

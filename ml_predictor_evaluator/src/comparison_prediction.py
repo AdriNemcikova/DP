@@ -1,5 +1,5 @@
 """
-    Skript, ktory sluzi na porovnanie upravenych predikcii pre analyzu citlivosti
+    In this python script we merge shifted predictions into one image.
 """
 
 import os
@@ -9,7 +9,12 @@ from PIL import Image
 
 def get_concat_h(im1, im2, im3, im4):
     """
-        Funkcia na horizontalne spojenie obrazkov
+        Function for merging images horizontally.
+        :im1: image of original plotted prediction;
+        :im2: image of shifted plotted prediction 1 step up;
+        :im3: image of shifted plotted prediction 2 steps up;
+        :im4: image of shifted plotted prediction 1 step down;
+        :return: image; merged image
     """
     dst = Image.new('RGB', (im1.width + im2.width + im3.width + im4.width, im1.height))
     dst.paste(im1, (0, 0))
@@ -21,7 +26,12 @@ def get_concat_h(im1, im2, im3, im4):
 
 def get_comparison(dir_original, dir_shifted_one_up, dir_shifted_two_up, dir_shifted_one_down, dir_compared):
     """
-        Funkcia na ziskanie plotov zo 4 suborov, ktore ak sa zhoduju v ID v nazve, spoja sa do jedneho obrazka
+        Function for finding if predictions with shifted values we achieved to plot and if so, we  will merge them horizontally.
+        :dir_original: path to directory with original plotted predictions;
+        :dir_shifted_one_up: path to directory with plotted predictions shifted 1 value up;
+        :dir_shifted_two_up: path to directory with plotted predictions shifted 2 values up;
+        :dir_shifted_one_down: path to directory with plotted predictions shifted 1 values down;
+        :dir_compared: path to directory where we will save merged images;
     """
     global img2, img3, img4
     for original_pred_name in os.listdir(dir_original):
@@ -54,14 +64,13 @@ def get_comparison(dir_original, dir_shifted_one_up, dir_shifted_two_up, dir_shi
         if img2 is not None and img3 is not None and img4 is not None:
             get_concat_h(img1, img2, img3, img4).save(f'{dir_compared}' + f'{original_pred_name}')
 
-"""Zadefinovanie ciest k suborom"""
+"""We will define path to directiories we need to use in function get_comparison()"""
 dir_original_preds = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Sensitivity_analysis\\predictions_original\\original_pred_kepler\\'
 dir_shift_one_up_pred = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Sensitivity_analysis\\predictions_one_up\\one_up_pred_kepler\\'
 dir_shift_two_up_pred = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Sensitivity_analysis\\predictions_two_up\\two_up_pred_kepler\\'
 dir_shift_one_down_pred = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Sensitivity_analysis\\predictions_one_down\\one_down_pred_kepler\\'
 dir_compared_preds = os.path.dirname(os.path.abspath(__file__)) + '\\plots\\Sensitivity_analysis\\comparison\\compared_kepler\\'
 
-"""Pouzitie funkcie na porovnanie plotov predikcii"""
 get_comparison(dir_original_preds, dir_shift_one_up_pred, dir_shift_two_up_pred, dir_shift_one_down_pred, dir_compared_preds)
 
 

@@ -1,4 +1,4 @@
-# Konfiguracny file pre vykreslovanie kriviek
+# Config file with attributes we need to use when calculating light curve
 
 SYSTEM_DICT = {
         'system': {
