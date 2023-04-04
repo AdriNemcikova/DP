@@ -2,6 +2,12 @@
 ## Adriana Nemcikova - Diploma thesis
 ### 2023, HI, KKUI, FEI TUKE
 
+## Datasets
+We used next dataset for our experiments:
+* synthetic over-contact data - available [here](https://mega.nz/file/5m43WQyK#G2WuLjqAkQT0OxQ4j-rZarCnmbtEx1rDQppiFNX8GdM)
+* synthetic detached data - available [here](https://mega.nz/file/g3hVAKaT#NYCF7TzrOvn11laTDz5rTz3_dHnKClOfwhFzACepnig)
+* observed over-contact - created with [script](https://github.com/AdriNemcikova/DP/blob/master/observed/create_over.ipynb) available [here](https://github.com/AdriNemcikova/DP/blob/master/observed/observed_over.csv)
+* observed detached - created with [script](https://github.com/AdriNemcikova/DP/blob/master/observed/create_det.ipynb) available [here](https://github.com/AdriNemcikova/DP/blob/master/observed/observed_det.csv)
 
 ## Exploratory analysis.
 In this script we worked on exploratory analysis of each dataset we were provided with.
@@ -52,7 +58,7 @@ Since we wanted to back-plot light curves from predicted values, we need to crea
 ## Sensitivity analysis
 We created experiment of sensitivity analysis fo **detached** data, where we shifted predicted values, 1 value, up, 2 values up and 1 value down. We saved shifted 
 predictions in specified [folders](https://github.com/AdriNemcikova/DP/tree/master/Detached_sensitivity_analysis). Second script contains code to merge plotted 
-predictions.
+predictions. All plotted shifted predictions and its comparison can be find [here](https://mega.nz/folder/dSB30Q4C#g6J0-NE4cbgnYLjWY-QpWQ).
 * [DET_sensitivity_analysis_all.ipynb](https://github.com/AdriNemcikova/DP/blob/master/DET_sensitivity_analysis_all.ipynb)
 * [comparison_prediction.py](https://github.com/AdriNemcikova/DP/blob/master/ml_predictor_evaluator/src/comparison_prediction.py)
 
