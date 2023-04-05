@@ -58,7 +58,7 @@ Since we wanted to back-plot light curves from predicted values, we need to crea
 ## Sensitivity analysis
 We created experiment of sensitivity analysis fo **detached** data, where we shifted predicted values, 1 value, up, 2 values up and 1 value down. We saved shifted 
 predictions in specified [folders](https://github.com/AdriNemcikova/DP/tree/master/Detached_sensitivity_analysis). Second script contains code to merge plotted 
-predictions. All plotted shifted predictions and its comparison can be find [here](https://mega.nz/folder/dSB30Q4C#g6J0-NE4cbgnYLjWY-QpWQ).
+predictions. All plotted shifted predictions and its comparison can be find [here](https://mega.nz/file/ICg0kZqL#ay_nBvzu0Xy1ydGZ6C6bSzPqB3-ZJ5RVGIw0hGNUV0Y) in zip file.
 * [DET_sensitivity_analysis_all.ipynb](https://github.com/AdriNemcikova/DP/blob/master/DET_sensitivity_analysis_all.ipynb)
 * [comparison_prediction.py](https://github.com/AdriNemcikova/DP/blob/master/ml_predictor_evaluator/src/comparison_prediction.py)
 
